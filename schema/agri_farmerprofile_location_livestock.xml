@@ -1,0 +1,10 @@
+<schema adapter="tagabukid_maguuma">
+    <element tablename="agri_farmerprofile_location_livestock">
+    <field name="objid" primary="true" prefix="PL" />
+    <field name="locationid" required="true" caption="locationid" />
+    <field name="breed_objid" required="true" caption="breed_objid" />
+    <field name="seedingdate" required="true" caption="seedingdate" />
+    <field name="harvestingdate" required="true" caption="harvestingdate" />
+    <field name="remark" required="true" caption="remark" />
+    </element>
+</schema>

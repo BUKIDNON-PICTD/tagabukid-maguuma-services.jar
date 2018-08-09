@@ -1,0 +1,42 @@
+import com.rameses.annotations.*;
+import com.rameses.common.*;
+import com.rameses.services.extended.*;
+
+
+class FarmerProfileService extends ActiveCrudListService 
+{
+	@ActiveDB(value='agri_pagrifarmer', em='tagabukid_maguuma')
+	def em;
+	
+		@ProxyMethod
+	def initCreate(){
+		def entity = [:];
+		entity.state = "DRAFT"
+		entity.recordlog = [:]
+        entity.farmer = [:]
+		entity.recordlog.datecreated = dtSvc.serverDate
+        entity.recordlog.createdbyuserid = env.USERID
+        entity.recordlog.createdbyuser = env.FULLNAME
+        entity.recordlog.dateoflastupdate =  dtSvc.serverDate
+        entity.recordlog.lastupdatedbyuserid = env.USERID
+        entity.recordlog.lastupdatedbyuser = env.FULLNAME
+
+        entity.farmlocations = []
+		entity.farmfacilities = []
+        return entity;
+
+	}
+
+
+   @ProxyMethod 
+	public def formatAddress( def x, def delimiter) {
+		// println objid
+		// def municipality = emmain.findMunicipality([objid:objid])
+		// def barangay = persistenceSvc.read([ _schemaname: 'barangay', objid:x.barnagay.objid])
+		def txt1 = [x.unitno, x.bldgno, x.bldgname].findAll{ (it? true: false) }.join(" ").trim(); 
+		def txt2 = [x.street, x.subdivision].findAll{ (it? true: false) }.join(" ").trim(); 
+		def txt3 = [x.barangay?.name, x.city, x.barangay.parent.name, x.province].findAll{ (it? true: false) }.join(", ").trim(); 
+		return [txt1, txt2, txt3].findAll{ (it? true: false) }.join( delimiter ).trim();
+	}
+		
+}

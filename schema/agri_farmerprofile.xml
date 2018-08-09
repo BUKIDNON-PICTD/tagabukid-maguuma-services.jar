@@ -11,17 +11,17 @@
   <field name="farmer_birthdate" required="true" caption="Birth Date" searchable="true" />
   <field name="farmer_birthplace" required="true" caption="Birth Plalce" visible="false"  searchable="false" />
   <field name="farmer_gender" required="true" caption="Gender" searchable="true" />
-  <field name="farmer_civilstatus" required="true" caption="Civil Status"  visible="false" searchable="false" />
+  <field name="farmer_civilstatus" required="true" caption="Civil Status"  visible="true" searchable="false" />
   <field name="farmer_citizenship" required="true" caption="Citizenship"  visible="false" searchable="false" />
   <field name="farmer_phoneno" required="false" visible="false" searchable="false" />
   <field name="farmer_mobileno" required="false" visible="false" searchable="false" />
   <field name="farmer_email" required="false" visible="false" searchable="false" />
-
+  <complex name="farmer_address" required="true" visible="false" serializer="default"/>
   <field name="farmer_address_text" required="true" caption="Address"  searchable="true"/>
-  <field name="farmer_address_barangayid" required="true" searchable="true" visible="false"/>
-  <field name="farmer_address_municipalityid" required="true" searchable="true" visible="false"/>
+  <field name="spouse_objid" required="false" searchable="true" visible="false"/>
+  <field name="spouse_name" required="false" visible="true" caption="Spouse Name" searchable="true"/>
 
-  <field name="maidenname" required="false" visible="true" caption="Name" searchable="true" />
+  <field name="maidenname" required="false" visible="false" searchable="true" />
   <field name="nameextension" required="false" visible="false" searchable="false" />
   <field name="prenametitle" required="false" visible="false" searchable="false" />
   <field name="postnametitle" required="false" visible="false" searchable="false" />
@@ -34,6 +34,13 @@
   <field name="recordlog_lastupdatedbyuserid" required="true" visible="false" searchable="false" />
   <field name="recordlog_lastupdatedbyuser" required="true" visible="false" searchable="false" />
 
+  <complex name="farmlocations" ref="agri_farmerprofile_location" jointype="one-to-many" required="false">
+    <key field="objid" target="farmerprofileid" /> 		
+  </complex>
+
+  <complex name="farmfacilities" ref="agri_farmerprofile_facility" jointype="one-to-many" required="false">
+      <key field="objid" target="farmerprofileid" /> 		
+  </complex>
   </element>
 
 </schema>
