@@ -1,0 +1,9 @@
+<schema adapter="tagabukid_maguuma">
+	<element tablename="livestock_species">
+		<field name="objid" primary="true" prefix="COM" />
+		<field name="name" required="true" caption="Name" searchable="true" indexed="true"/>
+		<field name="code" required="false" caption="Code" searchable="true" indexed="true"/>
+		<field name="description" required="false" caption="Description" searchable="true" indexed="true"/>
+		<field name="unit" required="false" caption="Unit" searchable="true" indexed="true"/>
+	</element>
+</schema>

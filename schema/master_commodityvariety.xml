@@ -1,0 +1,11 @@
+<schema adapter="tagabukid_maguuma">
+	<element tablename="commodity_variety">
+		<field name="objid" primary="true" prefix="COM-VAR" />
+		<field name="commoditytype_objid" primary="false" visible="false" prefix="COM-TYPE"/>
+		<field name="commoditytype_name" required="true" caption="Commodity Type Name" searchable="true" indexed="true"/>
+		<field name="name" required="true" caption="Name" searchable="true" indexed="true"/>
+		<field name="code" required="false" caption="Code" searchable="true" indexed="true"/>
+		<field name="description" required="false" caption="Description" searchable="true" indexed="true"/>
+		
+	</element>
+</schema>

@@ -1,0 +1,8 @@
+<schema adapter="tagabukid_maguuma">
+	<element tablename="facility">
+		<field name="objid" primary="true" prefix="FAL" />
+		<field name="name" required="true" searchable="true" indexed="true"/>
+		<field name="code" required="false" searchable="true" indexed="true"/>
+		<field name="description" required="false" searchable="true" indexed="true"/>
+	</element>
+</schema>

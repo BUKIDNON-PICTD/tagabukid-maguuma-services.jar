@@ -1,0 +1,9 @@
+<schema adapter="tagabukid_maguuma">
+	<element tablename="facility">
+		<field name="objid" primary="true" prefix="FF" />
+		<field name="parentid" required="false" searchable="false" indexed="true"/>
+		<field name="facility_objid" required="false" searchable="true" indexed="true"/>
+		<field name="name" required="false" searchable="true" indexed="true"/>
+		<field name="facility_number" required="false" searchable="true" indexed="true"/>
+	</element>
+</schema>
