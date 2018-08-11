@@ -7,23 +7,31 @@ class FarmerProfileService extends ActiveCrudListService
 {
 	@ActiveDB(value='agri_pagrifarmer', em='tagabukid_maguuma')
 	def em;
-	
-		@ProxyMethod
+	@Env
+	def env;
+
+	@Service('DateService')
+	def dtSvc 
+
+	@Service("SequenceService")
+	def seqSvc;
+
+	@ProxyMethod
 	def initCreate(){
 		def entity = [:];
 		entity.state = "DRAFT"
 		entity.recordlog = [:]
-        entity.farmer = [:]
+		entity.farmer = [:]
 		entity.recordlog.datecreated = dtSvc.serverDate
-        entity.recordlog.createdbyuserid = env.USERID
-        entity.recordlog.createdbyuser = env.FULLNAME
-        entity.recordlog.dateoflastupdate =  dtSvc.serverDate
-        entity.recordlog.lastupdatedbyuserid = env.USERID
-        entity.recordlog.lastupdatedbyuser = env.FULLNAME
+		entity.recordlog.createdbyuserid = env.USERID
+		entity.recordlog.createdbyuser = env.FULLNAME
+		entity.recordlog.dateoflastupdate =  dtSvc.serverDate
+		entity.recordlog.lastupdatedbyuserid = env.USERID
+		entity.recordlog.lastupdatedbyuser = env.FULLNAME
 
-        entity.farmlocations = []
+		entity.farmlocations = []
 		entity.farmfacilities = []
-        return entity;
+		return entity;
 
 	}
 
