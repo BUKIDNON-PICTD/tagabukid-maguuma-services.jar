@@ -13,20 +13,22 @@
   <field name="farmer_gender" required="true" caption="Gender" searchable="true" />
   <field name="farmer_civilstatus" required="true" caption="Civil Status"  visible="true" searchable="false" />
   <field name="farmer_citizenship" required="true" caption="Citizenship"  visible="false" searchable="false" />
+  
   <field name="farmer_phoneno" required="false" visible="false" searchable="false" />
   <field name="farmer_mobileno" required="false" visible="false" searchable="false" />
   <field name="farmer_email" required="false" visible="false" searchable="false" />
+
   <complex name="farmer_address" required="true" visible="false" serializer="default"/>
   <field name="farmer_address_text" required="true" caption="Address"  searchable="true"/>
+<!--Spouse-->
   <field name="spouse_objid" required="false" searchable="true" visible="false"/>
-  <field name="spouse_name" required="false" visible="true" caption="Spouse Name" searchable="true"/>
-
+<!--name extension-->
   <field name="maidenname" required="false" visible="false" searchable="true" />
   <field name="nameextension" required="false" visible="false" searchable="false" />
   <field name="prenametitle" required="false" visible="false" searchable="false" />
   <field name="postnametitle" required="false" visible="false" searchable="false" />
 
-
+<!--record log-->
   <field name="recordlog_datecreated" required="true" visible="false" searchable="false" />
   <field name="recordlog_createdbyuserid" required="true" visible="false" searchable="false" />
   <field name="recordlog_createdbyuser" required="true" visible="false" searchable="false" />
