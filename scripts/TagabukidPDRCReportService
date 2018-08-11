@@ -1,0 +1,51 @@
+import com.rameses.annotations.*
+import com.rameses.common.*
+import com.rameses.services.extended.*;
+
+class TagabukidPDRCReportService 
+{
+	@ActiveDB(value='pdrc_detainees', em='tagabukid_pdrc')
+	def emx;
+
+	@Service("PersistenceService")
+    def persistenceSvc;
+
+	@Service('DateService')
+	def dtSvc 
+
+	@Service('NumberService')
+	def numSvc
+
+	@Service('RPTUtil')
+	def util
+
+	@Env
+	def env;
+
+	@ProxyMethod
+	public def getPDRCMasterListByGender(){
+		// def data = [:]
+	    // def reportdata = []
+
+        // if(params.gender == "Male"){
+        //     params.filter = "AND UPPER(xxx.`gender`) IN ('MALE','M') "
+        // }else{
+        //     params.filter = "AND UPPER(xxx.`gender`) IN ('FEMALE','F') "
+        // }
+        // params.casefileid = params.casefile.objid
+
+        // reportdata =  emx.getTest()
+	
+		// data.reportdata = reportdata;
+		// data.parameters = [
+		// 	LGUNAME  :"PG-BUKIDNON, REGION 10",
+		// 	LGUADDRESS : "Provincial Capiptol, City of Malaybalay",
+		// 	TITLE :"PDRC Master List (" + params.gender.toUpperCase() + ") Case:"  + params.casefile.name.toUpperCase()
+		// ]
+		return emx.getTest()
+
+	}
+
+
+
+}
