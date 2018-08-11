@@ -2,9 +2,17 @@
     <element tablename="agri_farmerprofile_location_livestock">
     <field name="objid" primary="true" prefix="PL" />
     <field name="locationid" required="true" caption="locationid" />
+    <field name="species_objid" required="true" caption="breed_objid" />
     <field name="breed_objid" required="true" caption="breed_objid" />
     <field name="seedingdate" required="true" caption="seedingdate" />
     <field name="harvestingdate" required="true" caption="harvestingdate" />
     <field name="remark" required="true" caption="remark" />
     </element>
+
+    <complex name="species" ref="master_livestock_species" jointype="many-to-one" required="false">
+            <key field="species_objid" target="objid" /> 		
+    </complex>
+    <complex name="breed" ref="master_livestock_breed" jointype="many-to-one" required="false">
+        <key field="breed_objid" target="objid" /> 		
+    </complex>
 </schema>
