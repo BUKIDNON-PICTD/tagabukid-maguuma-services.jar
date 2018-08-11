@@ -4,6 +4,7 @@
 		<field name="farmerprofileid" required="false" searchable="false" indexed="true"/>
 		<field name="facility_objid" required="false" searchable="true" indexed="true"/>
 		<field name="quantity" required="false" searchable="true" indexed="true"/>
+		<field name="modeofaquisition" required="false" searchable="true" indexed="true"/>
 		<complex name="facility" ref="master_facility" jointype="many-to-one" required="false">
             <key field="facility_objid" target="objid" /> 		
         </complex>
