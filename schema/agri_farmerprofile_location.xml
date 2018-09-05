@@ -2,11 +2,12 @@
     <element tablename="agri_farmerprofile_location">
         <field name="objid" primary="true" prefix="FL" />
         <field name="farmerprofileid" required="true" caption="farmerprofileid" />
-        <complex name="location" required="true" serializer="default" />
-        <field name="location_text" required="true" caption="location_text" />
-        <field name="areasqm" required="true" caption="areaha" />
+        <field name="location_barangay_objid" required="false"/>
+        <complex name="location" required="false" serializer="default" />
+        <field name="location_text" required="false" caption="location_text" />
+        <field name="areasqm" required="false" caption="areaha" />
         <field name="pin" required="false" caption="pin" />
-        <field name="modeofacquisition" required="true" caption="modeacquisition" />
+        <field name="modeofacquisition" required="false" caption="modeacquisition" />
 
         <complex name="commodities" ref="agri_farmerprofile_location_commodity" jointype="one-to-many" required="false">
             <key field="objid" target="locationid" /> 		

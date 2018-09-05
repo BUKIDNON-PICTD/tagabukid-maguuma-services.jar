@@ -1,25 +1,25 @@
 <schema adapter="tagabukid_maguuma">
 	<element tablename="agri_farmerprofile">
     <field name="objid" primary="true" prefix="FARM"/>
-    <field name="state" required="true"  caption="Farmer No" searchable="true" visible="false"/>
+    <field name="state" required="true"  caption="state" searchable="true" visible="false"/>
     <field name="fno" required="true"  caption="Farmer No" searchable="true" visible="false"/>
     <field name="farmer_objid" required="true" searchable="true" visible="false"/>
     <field name="farmer_name" required="true" visible="true" caption="Farmer Name" searchable="true"/>
-    <field name="farmer_lastname" required="true" visible="false" caption="Last Name" searchable="false" />
-    <field name="farmer_firstname" required="true" visible="false" caption="First Name" searchable="false" />
-    <field name="farmer_middlename" required="true" caption="Middle Name"  visible="false" searchable="false" />
-    <field name="farmer_birthdate" required="true" caption="Birth Date" searchable="true" />
-    <field name="farmer_birthplace" required="true" caption="Birth Plalce" visible="false"  searchable="false" />
-    <field name="farmer_gender" required="true" caption="Gender" searchable="true" />
-    <field name="farmer_civilstatus" required="true" caption="Civil Status"  visible="true" searchable="false" />
-    <field name="farmer_citizenship" required="true" caption="Citizenship"  visible="false" searchable="false" />
+    <field name="farmer_lastname" required="false" visible="false" caption="Last Name" searchable="false" />
+    <field name="farmer_firstname" required="false" visible="false" caption="First Name" searchable="false" />
+    <field name="farmer_middlename" required="false" caption="Middle Name"  visible="false" searchable="false" />
+    <field name="farmer_birthdate" required="false" caption="Birth Date" searchable="true" />
+    <!--<field name="farmer_birthplace" required="true" caption="Birth Plalce" visible="false"  searchable="false" />-->
+    <field name="farmer_gender" required="false" caption="Gender" searchable="true" />
+    <field name="farmer_civilstatus" required="false" caption="Civil Status"  visible="true" searchable="false" />
+    <field name="farmer_citizenship" required="false" caption="Citizenship"  visible="false" searchable="false" />
     
     <field name="farmer_phoneno" required="false" visible="false" searchable="false" />
     <field name="farmer_mobileno" required="false" visible="false" searchable="false" />
     <field name="farmer_email" required="false" visible="false" searchable="false" />
 
-    <complex name="farmer_address" required="true" visible="false" serializer="default"/>
-    <field name="farmer_address_text" required="true" caption="Address"  searchable="true"/>
+    <complex name="farmer_address" required="false" visible="false" serializer="default"/>
+    <field name="farmer_address_text" required="false" caption="Address"  searchable="true"/>
 
     <field name="spouse_objid" required="false" searchable="true" visible="false"/>
  
@@ -35,6 +35,7 @@
     <field name="recordlog_dateoflastupdate" required="true" visible="false" searchable="false" />
     <field name="recordlog_lastupdatedbyuserid" required="true" visible="false" searchable="false" />
     <field name="recordlog_lastupdatedbyuser" required="true" visible="false" searchable="false" />
+    <field name="photo" required="false" visible="false" searchable="false" />
 
     <complex name="farmlocations" ref="agri_farmerprofile_location" jointype="one-to-many" required="false">
       <key field="objid" target="farmerprofileid" /> 		
