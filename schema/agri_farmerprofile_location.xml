@@ -1,21 +1,21 @@
 <schema adapter="tagabukid_maguuma">
     <element tablename="agri_farmerprofile_location">
         <field name="objid" primary="true" prefix="FL" />
-        <field name="farmerprofileid" required="true" caption="farmerprofileid" />
-        <complex name="location" required="true" serializer="default" />
+        <!-- <field name="farmerprofileid" required="true" caption="farmerprofileid" /> -->
+        <complex name="farmlocation" required="true" serializer="default" />
         <field name="location_text" required="true" caption="location_text" />
+        <field name="barangay_objid" required="true" caption="location_text" />
         <field name="areasqm" required="true" caption="areaha" />
         <field name="pin" required="false" caption="pin" />
         <field name="modeofacquisition" required="true" caption="modeacquisition" />
-
+        <complex name="geolocation" required="false" caption="geolocation" serializer="default"/>
+<!-- 
         <complex name="commodities" ref="agri_farmerprofile_location_commodity" jointype="one-to-many" required="false">
             <key field="objid" target="locationid" /> 		
         </complex>
 
         <complex name="livestocks" ref="agri_farmerprofile_location_livestock" jointype="one-to-many" required="false">
             <key field="objid" target="locationid" /> 		
-        </complex>
-
-  
+        </complex> -->
     </element>
 </schema>

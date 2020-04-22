@@ -1,12 +1,25 @@
 import com.rameses.annotations.*;
 import com.rameses.common.*;
 import com.rameses.services.extended.*;
+import javax.servlet.http.*;
 
-
-class FarmerProfileService extends ActiveCrudListService 
+class FarmerProfileService extends ActiveCrudListService
 {
-	@ActiveDB(value='agri_pagrifarmer', em='tagabukid_maguuma')
+	@PersistenceContext('main')
+	def main
+
+	@PersistenceContext('tagabukid_maguuma')
+	def agri
+
+	@ActiveDB(value='tagabukidmaguuma', em='tagabukid_maguuma')
+	def agriem;
+
+	@ActiveDB(value='agri_farmerprofile', em='testpagri')
 	def em;
+
+	@ActiveDB(value='tagabukiddash', em='testpagri')
+	def dash;
+
 	@Env
 	def env;
 
@@ -15,6 +28,15 @@ class FarmerProfileService extends ActiveCrudListService
 
 	@Service("SequenceService")
 	def seqSvc;
+
+	@Service("QueryService")
+    def querySvc;
+	
+	@Service('NumberService')
+    def numSvc;
+
+	@Service("PersistenceService")
+    def persistenceSvc;  
 
 	@ProxyMethod
 	def initCreate(){
@@ -36,7 +58,7 @@ class FarmerProfileService extends ActiveCrudListService
 	}
 
 
-   @ProxyMethod 
+   	@ProxyMethod 
 	public def formatAddress( def x, def delimiter) {
 		// println objid
 		// def municipality = emmain.findMunicipality([objid:objid])
@@ -46,5 +68,667 @@ class FarmerProfileService extends ActiveCrudListService
 		def txt3 = [x.barangay?.name, x.city, x.barangay.parent.name, x.province].findAll{ (it? true: false) }.join(", ").trim(); 
 		return [txt1, txt2, txt3].findAll{ (it? true: false) }.join( delimiter ).trim();
 	}
+
+	// void beforeList(o){
+	// 	println o;
+	// }
+	@ProxyMethod 
+	public def getFarmersList(params) {
+		println params.searchtext
+		def p = [_schemaname: 'agri_farmerprofile'];
+		params.searchtext = (params.searchtext ? params.searchtext :'')+'%'
+		p.where = ['fno like :searchtext or farmer_name like :searchtext', [searchtext :params.searchtext]];
+		p._start = params.paging.start.toInteger();
+		p._limit = params.paging.limit.toInteger();
+		p.orderBy = 'fno,farmer_name';
+		def list = querySvc.getList(p);
 		
+		return list;
+	}
+
+	@ProxyMethod 
+	public def udpateFarmerBarangay() {
+		def farmers = agri.sqlContext.createQuery('''
+			SELECT objid 
+			FROM agri_farmerprofile
+			WHERE barangay_objid = ""
+			LIMIT 0, 5
+			''')
+			.resultList;
+
+		farmers.each{
+		
+			def entity = persistenceSvc.read([ _schemaname: 'agri_farmerprofile', objid: it.objid]);
+			if (entity.farmer.address.barangay){
+				entity.barangay = entity.farmer.address.barangay
+				entity._schemaname = 'agri_farmerprofile'
+				persistenceSvc.save(entity);
+			} else {
+				entity.barangay.objid = entity.lguid;
+				entity._schemaname = 'agri_farmerprofile'
+				persistenceSvc.save(entity);
+			}
+		}
+		def x = agri.sqlContext.createQuery('''
+			SELECT objid 
+			FROM agri_farmerprofile
+			WHERE barangay_objid = ""
+			LIMIT 0, 5
+			''')
+			.resultList;	
+		return x.size;
+	}
+
+	@ProxyMethod() 
+	public def dash(params) { 
+		def data = [
+			agridash   : 	dash.getDashDataAgri(),			
+			agridashqty   : 	dash.getDashDataAgriQty(),		
+			agridashtotal   : 	dash.getDashDataAgriTotal()			
+		] 
+		 
+		data.agridash.each{
+			it.ADLAI =  it.ADLAI;
+			it.VEGETABLE =  it.VEGETABLE;
+			it.CORN =  it.CORN;
+			it.RICE =  it.RICE;
+			it.LIVESTOCK =  it.LIVESTOCK;
+			it.FISHERIES =  it.FISHERIES;
+			it.ORNAMENTALS =  it.ORNAMENTALS;
+			it.FRUITS =  it.FRUITS;
+			it.INDUSTRIAL.CROPS =  it.INDUSTRIAL.CROPS;
+		}
+
+		data.agridashtotal.each{
+			it.ADLAI = numSvc.format('#,##0.00', it.ADLAI);
+			it.VEGETABLE = numSvc.format('#,##0.00', it.VEGETABLE);
+			it.CORN = numSvc.format('#,##0.00', it.CORN);
+			it.RICE = numSvc.format('#,##0.00', it.RICE);
+			it.LIVESTOCK = numSvc.format('#,##0.00', it.LIVESTOCK);
+			it.FISHERIES = numSvc.format('#,##0.00', it.FISHERIES);
+			it.ORNAMENTALS = numSvc.format('#,##0.00', it.ORNAMENTALS);
+			it.FRUITS = numSvc.format('#,##0.00', it.FRUITS);
+			it.INDUSTRIAL.CROPS = numSvc.format('#,##0.00', it.INDUSTRIAL.CROPS);
+		}
+
+		data.agridashqty.each{
+			it.ADLAI = numSvc.format('#,##0.00', it.ADLAI);
+			it.VEGETABLE = numSvc.format('#,##0.0000', it.VEGETABLE);
+			it.CORN = numSvc.format('#,##0.0000', it.CORN);
+			it.RICE = numSvc.format('#,##0.0000', it.RICE);
+			it.LIVESTOCK = numSvc.format('#,##0.00', it.LIVESTOCK);
+			it.FISHERIES = numSvc.format('#,##0.0000', it.FISHERIES);
+			it.ORNAMENTALS = numSvc.format('#,##0.0000', it.ORNAMENTALS);
+			it.FRUITS = numSvc.format('#,##0.0000', it.FRUITS);
+			it.INDUSTRIAL.CROPS = numSvc.format('#,##0.0000', it.INDUSTRIAL.CROPS);
+		}
+		
+		return data;
+	} 
+
+	// @ProxyMethod() 
+	// public def pareparefarmerlocaltoserversync(params) { 
+	// 		def farmertosync = agri.sqlContext.createQuery('''
+	// 			SELECT objid FROM agri_farmerprofile WHERE objid NOT IN (SELECT refid FROM agri_syncdata WHERE syncdevice = $P{clientid}) LIMIT 0, 1000
+	// 			''').setParameter('clientid', params.clientid).resultList;
+	// 		if (farmertosync.size() > 0){
+	// 			farmertosync.each{
+	// 				try{
+	// 					def syncdata = [
+	// 						objid: it.objid + params.clientid,
+	// 						syncdevice : params.clientid,
+	// 						synctype : 'farmer',
+	// 						state: 'FORSYNC',
+	// 						refid : it.objid
+	// 					]
+	// 					syncdata._schemaname = 'agri_syncdata'
+	// 					persistenceSvc.create(syncdata);
+	// 					println "PREPARED :" + it.objid + " FOR SYNC";
+	// 				}catch(e){
+	// 					println (e);
+	// 					// throw new Exception(e);
+	// 				}
+	// 			}
+	// 		}
+	// 		def totalfarmerforsync = agri.sqlContext.createQuery('''
+	// 			SELECT COUNT(*) AS total FROM agri_farmerprofile WHERE objid NOT IN (SELECT refid FROM tagabukid_maguuma.`agri_syncdata` WHERE syncdevice = $P{clientid} )
+	// 			''').setParameter('clientid', params.clientid).singleResult;
+	// 		def totalpreparedforsync = agri.sqlContext.createQuery('''
+	// 			SELECT COUNT(*) AS total FROM `agri_syncdata` WHERE state = 'FORSYNC' AND syncdevice = $P{clientid} AND synctype = 'farmer'
+	// 			''').setParameter('clientid', params.clientid).singleResult;
+	// 		def totalfarmers = agri.sqlContext.createQuery('''
+	// 			SELECT COUNT(*) AS total FROM agri_farmerprofile
+	// 			''').singleResult;
+			
+	// 		return [forprep: totalfarmerforsync.total, forsync: totalpreparedforsync.total, totalrecords: totalfarmers.total];
+	// }
+
+	@ProxyMethod() 
+	public def startfarmerlocaltoserversync(params) { 
+		def farmertosync = agri.sqlContext.createQuery('''
+				SELECT objid 
+				FROM agri_farmerprofile 
+				WHERE objid NOT IN (SELECT refid FROM agri_syncdata WHERE syncdevice = $P{clientid} AND synctype = $P{synctype}) AND lguid = $P{lguid} LIMIT 0, 5
+				''')
+				.setParameter('clientid', params.clientid)
+				.setParameter('lguid', params.lguid)
+				.setParameter('synctype', params.synctype)
+				.resultList;
+		// def farmertosync = agriem.getFarmerForSync(params);
+		// def farmertosync = agri.sqlContext.createQuery('''
+		// 		SELECT * FROM `agri_syncdata` WHERE state = 'FORSYNC' AND syncdevice = $P{clientid} AND synctype = 'farmer'
+		// 		LIMIT 0,25
+		// 		''').setParameter('clientid', params.clientid).resultList;
+
+		// if (!farmertosync){
+		// 	return null;
+		// }
+		// def entity = persistenceSvc.read([ _schemaname: 'agri_farmerprofile', objid: farmertosync.refid]);
+		// entity.farmer = persistenceSvc.read([ _schemaname: 'entityindividual', objid: entity.farmer.objid]);
+		// if (entity.spouse.objid){
+		// 	entity.spouse = persistenceSvc.read([ _schemaname: 'entityindividual', objid: entity.spouse.objid]);
+		// }
+
+		// entity.farmlocations = entity.farmlocations.collect{ x -> persistenceSvc.read([ _schemaname: 'agri_farmerprofile_location', objid: x.objid])}
+
+		// entity.farmfacilities = entity.farmfacilities.collect{ x -> persistenceSvc.read([ _schemaname: 'agri_farmerprofile_facility', objid: x.objid])}
+
+		// println 'Sending Farmer : ' + entity.objid;
+		// return entity;
+
+		def items = []
+		if (!farmertosync){
+			confirmsync(params);
+		}
+		farmertosync.each{
+			def entity = persistenceSvc.read([ _schemaname: 'agri_farmerprofile', objid: it.objid]);
+			entity.farmer = persistenceSvc.read([ _schemaname: 'entityindividual', objid: entity.farmer.objid]);
+			if (entity.spouse.objid){
+				entity.spouse = persistenceSvc.read([ _schemaname: 'entityindividual', objid: entity.spouse.objid]);
+			}
+
+			// entity.farmlocations = entity.farmlocations.collect{ x -> persistenceSvc.read([ _schemaname: 'agri_farmerprofile_location', objid: x.objid])}
+			// entity.commodities
+
+			entity.farmfacilities = entity.farmfacilities.collect{ x -> persistenceSvc.read([ _schemaname: 'agri_farmerprofile_facility', objid: x.objid])}
+			// println 'Farmer : ' + entity.objid;
+			items << entity
+		}
+		println 'Sending Farmer : ' + items.size() 
+		return items
+	}
+
+	// @ProxyMethod() 
+	// public def parepareentitylocaltoserversync(params) { 
+	// 		def entitytosync = main.sqlContext.createQuery('''
+	// 			SELECT * FROM entity WHERE objid NOT IN (SELECT refid FROM tagabukid_maguuma.`agri_syncdata`)
+	// 			LIMIT 0, 1000
+	// 			''').resultList;
+	// 		if (entitytosync.size() > 0){
+	// 			entitytosync.each{
+	// 				try{
+	// 					def syncdata = [
+	// 						objid: it.objid,
+	// 						syncdevice : 'test',
+	// 						synctype : 'entity',
+	// 						state: 'FORSYNC',
+	// 						refid : it.objid
+	// 					]
+	// 					syncdata._schemaname = 'agri_syncdata'
+	// 					persistenceSvc.create(syncdata);
+	// 					println "PREPARED :" + it.objid + " FOR SYNC";
+	// 				}catch(e){
+	// 					println (e);
+	// 					// throw new Exception(e);
+	// 				}
+	// 			}
+	// 		}
+	// 		def totalentityforsync = main.sqlContext.createQuery('''
+	// 			SELECT COUNT(*) AS total FROM entity WHERE objid NOT IN (SELECT refid FROM tagabukid_maguuma.`agri_syncdata`)
+	// 			''').singleResult;
+	// 		def totalpreparedforsync = agri.sqlContext.createQuery('''
+	// 			SELECT COUNT(*) AS total FROM `agri_syncdata` WHERE state = 'FORSYNC' AND syncdevice = $P{clientid} AND synctype = 'entity'
+	// 			''').setParameter('clientid', params.clientid).singleResult;
+	// 		def totalentities = main.sqlContext.createQuery('''
+	// 			SELECT COUNT(*) AS total FROM entity
+	// 			''').singleResult;
+			
+	// 		return [forprep: totalentityforsync.total, forsync: totalpreparedforsync.total, totalrecords: totalentities.total];
+	// }
+
+	@ProxyMethod() 
+	public def startentitylocaltoserversync(params) { 
+		def farmertosync = main.sqlContext.createQuery('''
+		SELECT e.objid 
+		FROM entityindividual e
+		INNER JOIN tagabukid_maguuma.`agri_farmerprofile` f ON f.`farmer_objid` = e.objid
+		WHERE e.objid NOT IN (SELECT refid FROM tagabukid_maguuma.agri_syncdata WHERE syncdevice = $P{clientid} AND synctype=$P{synctype}) LIMIT 0, 5;
+		''')
+		.setParameter('clientid', params.clientid)
+		.setParameter('lguid', params.lguid)
+		.setParameter('synctype', params.synctype)
+		.resultList;
+		def items = []
+		
+
+		if (!entitytosync){
+			confirmsync(params);
+		}
+
+		
+		entitytosync.each{
+			def entity = persistenceSvc.read([ _schemaname: 'entityindividual', objid: it.refid]);
+			items << entity
+		}
+		println 'Sending Entity : ' + items.size()
+		return items
+		
+		
+	}
+
+	@ProxyMethod() 
+	public def confirmsync(params) {
+		if(params.items){
+			params.items.each{
+
+				try{
+					def syncdata = [
+						objid: 'SD' + new java.rmi.server.UID(),
+						syncdevice : params.clientid,
+						synctype : params.synctype,
+						state: 'SYNCED',
+						refid : it
+					]
+					syncdata._schemaname = 'agri_syncdata'
+					persistenceSvc.create(syncdata);
+					// println 'Confirmed: ' + it;
+				}catch(e){
+					println (e);
+					// throw new Exception(e);
+				}
+				// agri.sqlContext.createExecutor('''
+				// UPDATE agri_syncdata SET state = 'SYNCED' WHERE refid = $P{objid} AND syncdevice = $P{clientid}
+				// ''')
+				// .setParameter('objid', it)
+				// .setParameter('clientid', params.clientid)
+				// .execute();
+				
+			}
+
+			// def params = [:]
+			// params._schemaname = 'agri_syncdata'
+			// params.vars = [objid:"'" + params.items.join("','") + "'"]
+			// params.where = ['syncdevice = $P{clientid} AND refid IN (${objid})', [clientid: params.clientid]]
+			// def forsync = querySvc.getList(params);
+
+			// forsync.each{
+
+			// }
+			// agri.sqlContext.createExecutor('''
+			// UPDATE agri_syncdata SET state = 'SYNCED' WHERE syncdevice = $P{clientid} AND refid IN (${objid})
+			// ''')
+			// .setVars([objid:"'" + params.items.join("','") + "'"])
+			// .setParameter('clientid', params.clientid)
+			// .execute()	
+		
+			
+		}
+
+		// if(params.item){
+		// 	agri.sqlContext.createExecutor('''
+		// 		UPDATE agri_syncdata SET state = 'SYNCED' WHERE refid = $P{objid} AND syncdevice = $P{clientid} 
+		// 		''')
+		// 		.setParameter('objid', params.item)
+		// 		.setParameter('clientid', params.clientid)
+		// 		.execute()
+		// }
+		def totalforsync = 0;
+		if (params.synctype == 'entityindividual'){
+			totalforsync = main.sqlContext.createQuery('''
+				SELECT COUNT(*) AS total
+				FROM entityindividual e
+				INNER JOIN tagabukid_maguuma.`agri_farmerprofile` f ON f.`farmer_objid` = e.objid
+				''')
+				.setParameter('clientid', params.clientid)
+				.setParameter('synctype', params.synctype)
+				.setParameter('lguid', params.lguid)
+				.singleResult;
+		}else if (params.synctype == 'farmer'){
+			totalforsync = agri.sqlContext.createQuery('''
+			SELECT COUNT(*) AS total FROM `agri_farmerprofile` WHERE lguid = $P{lguid}
+			''')
+			.setParameter('clientid', params.clientid)
+			.setParameter('synctype', params.synctype)
+			.setParameter('lguid', params.lguid)
+			.singleResult;
+		}
+		
+			
+		def totalsynced = agri.sqlContext.createQuery('''
+			SELECT COUNT(*) AS total FROM `agri_syncdata` WHERE state = 'SYNCED' AND syncdevice = $P{clientid} AND synctype = $P{synctype}
+			''')
+			.setParameter('clientid', params.clientid)
+			.setParameter('synctype', params.synctype)
+			.singleResult;
+
+
+		
+		return [totalforsync: totalforsync.total, totalsynced: totalsynced.total];
+		
+	}
+
+	@ProxyMethod() 
+	public def getMasterFiles(requestparams) { 
+		try{
+			def params = [:]
+			params._schemaname = 'master_commodity'
+			params.where = ['1 = 1']
+			def master_commodity = querySvc.getList(params);
+
+			params._schemaname = 'master_commodity_type'
+			params.where = ['1 = 1']
+			def master_commodity_type = querySvc.getList(params);
+
+			params._schemaname = 'master_commodity_variety'
+			params.where = ['1 = 1']
+			def master_commodity_variety = querySvc.getList(params);
+
+			params._schemaname = 'master_facility'
+			params.where = ['1 = 1']
+			def master_facility = querySvc.getList(params);
+
+			params._schemaname = 'master_livestock_breed'
+			params.where = ['1 = 1']
+			def master_livestock_breed = querySvc.getList(params);
+
+			params._schemaname = 'master_livestock_species'
+			params.where = ['1 = 1']
+			def master_livestock_species = querySvc.getList(params);
+
+			params._schemaname = 'master_assistance_classification'
+			params.where = ['1 = 1']
+			def master_assistance_classification = querySvc.getList(params);
+
+			params._schemaname = 'master_assistance_type'
+			params.where = ['1 = 1']
+			def master_assistance_type = querySvc.getList(params);
+
+			params._schemaname = 'master_surveyperiod'
+			params.where = ['1 = 1']
+			def master_surveyperiod = querySvc.getList(params);
+
+			
+			def barangay = main.sqlContext.createQuery('''
+				SELECT * FROM barangay  
+				''').resultList;
+
+			def municipality = main.sqlContext.createQuery('''
+				SELECT * FROM municipality  
+				''').resultList;
+
+			def province = main.sqlContext.createQuery('''
+				SELECT * FROM province  
+				''').resultList;
+			println requestparams
+			// def agri_farmerprofile_location = agri.sqlContext.createQuery('''
+			// 	SELECT *
+			// 	FROM agri_farmerprofile_location
+			// 	WHERE SUBSTRING_INDEX(`barangay_objid`, '-', 2) = $P{lguid}
+			// 	''')
+			// 	.setParameter('lguid', requestparams.lguid)
+			// 	.resultList;
+			def agri_farmerprofile_location = []
+			if (requestparams?.lguid){
+				params._schemaname = 'agri_farmerprofile_location'
+				params.where = ["SUBSTRING_INDEX(barangay_objid, '-', 2) = :lguid", [lguid :requestparams.lguid]];
+				agri_farmerprofile_location = querySvc.getList(params);
+			}
+			
+
+			def masterfiles = [
+				master_commodity : master_commodity,
+				master_commodity_type : master_commodity_type,
+				master_commodity_variety : master_commodity_variety,
+				master_facility : master_facility,
+				master_livestock_breed : master_livestock_breed,
+				master_livestock_species : master_livestock_species,
+				master_surveyperiod: master_surveyperiod,
+				barangay : barangay,
+				municipality : municipality,
+				province : province,
+				master_assistance_classification: master_assistance_classification,
+				master_assistance_type: master_assistance_type,
+				agri_farmerprofile_location: agri_farmerprofile_location,
+			]
+			return masterfiles;
+		}catch(e){
+			throw new Exception(e);
+		}
+	
+	}
+
+	@ProxyMethod 
+	public def test(params) {
+		def entity = persistenceSvc.read([ _schemaname: 'agri_farmerprofile', objid: params.farmerid]);
+		entity.farmer = persistenceSvc.read([ _schemaname: 'entityindividual', objid: entity.farmer.objid]);
+		if (entity.spouse.objid){
+			entity.spouse = persistenceSvc.read([ _schemaname: 'entityindividual', objid: entity.spouse.objid]);
+		}
+
+		entity.farmlocations = entity.farmlocations.collect{ x -> persistenceSvc.read([ _schemaname: 'agri_farmerprofile_location', objid: x.objid])}
+
+		entity.farmfacilities = entity.farmfacilities.collect{ x -> persistenceSvc.read([ _schemaname: 'agri_farmerprofile_facility', objid: x.objid])}
+
+		
+		return entity
+	}
+
+	@ProxyMethod 
+	public def addFarmerProfile(params) {
+		def user = agri.sqlContext.createQuery('''
+				SELECT * FROM users WHERE username = $P{username}
+			
+				''')
+				.setParameter('username', params.username)
+				.singleResult;
+		
+		def entity = [:];
+		entity = params.farmer
+		entity.state = "DRAFT"
+		entity.recordlog = [:]
+		entity.recordlog.datecreated = dtSvc.serverDate
+		entity.recordlog.createdbyuserid = user.id
+		entity.recordlog.createdbyuser = user.username
+		entity.recordlog.dateoflastupdate =  dtSvc.serverDate
+		entity.recordlog.lastupdatedbyuserid = user.id
+		entity.recordlog.lastupdatedbyuser = user.username
+		entity.fno = getFarmerNo(params.farmer.farmer.address)
+		entity.commodities = []
+		entity.livestocks = []
+		entity.farmfacilities = []
+		entity.farmerassistances = []
+		entity.farmer.birthdate = dtSvc.parse("yyyy-MM-dd'T'HH:mm:ss.SSS",entity.farmer.birthdate).toString();
+		def municipality = main.sqlContext.createQuery('''
+				SELECT * FROM municipality WHERE objid = $P{objid}
+				''')
+				.setParameter('objid', entity.farmer.address.municipality.objid)
+				.singleResult;
+		def entityindividaul = entity.farmer
+		entityindividaul._schemaname = 'entityindividual'
+		entityindividaul.type = 'INDIVIDUAL'
+		entityindividaul.address.type = 'local'
+		entityindividaul.address.municipality = municipality.name
+		entityindividaul.address.province = "PROVINCE OF BUKIDNON"
+		persistenceSvc.create(entityindividaul);
+
+		entity._schemaname = 'agri_farmerprofile'
+		persistenceSvc.create(entity);
+
+		def newfarmer = persistenceSvc.read(entity);
+		newfarmer.farmer._schemaname = 'entityindividual'
+		newfarmer.farmer = persistenceSvc.read(newfarmer.farmer);
+
+		return newfarmer;
+		
+	}
+
+	@ProxyMethod 
+	public def updateFarmerProfile(params) {
+		def user = agri.sqlContext.createQuery('''
+				SELECT * FROM users WHERE username = $P{username}
+			
+				''')
+				.setParameter('username', params.username)
+				.singleResult;
+		
+
+		def entity = [:];
+		entity = params.farmer
+		entity.recordlog.dateoflastupdate =  dtSvc.serverDate
+		entity.recordlog.lastupdatedbyuserid = user.id
+		entity.recordlog.lastupdatedbyuser = user.username
+
+		
+		
+		def entityindividaul = entity.farmer
+		entityindividaul._schemaname = 'entityindividual'
+		entityindividaul.type = 'INDIVIDUAL'
+		entityindividaul.address.type = 'local'
+		
+		if(!(entityindividaul.address.municipality instanceof String)){
+			def municipality = main.sqlContext.createQuery('''
+				SELECT * FROM municipality WHERE objid = $P{objid}
+				''')
+				.setParameter('objid', entity.farmer.address.municipality.objid)
+				.singleResult;
+			entityindividaul.address.municipality = municipality.name
+		}
+		
+		entityindividaul.address.province = "PROVINCE OF BUKIDNON"
+		persistenceSvc.save(entityindividaul);
+
+		
+
+		def spouse = entity.spouse
+		spouse._schemaname = 'entityindividual'
+		try {
+			spouse.birthdate = dtSvc.parse("yyyy-MM-dd'T'HH:mm:ss.SSS",spouse.birthdate).toString();
+		}catch (e){
+			//date is already parsed
+		}
+		// spouse.birthdate = dtSvc.parse("yyyy-MM-dd'T'HH:mm:ss.SSS",spouse.birthdate).toString();
+		spouse.type = 'INDIVIDUAL'
+		spouse.address.type = 'local'
+		
+		if(!(spouse.address.municipality instanceof String)){
+		 def municipality = main.sqlContext.createQuery('''
+			SELECT * FROM municipality WHERE objid = $P{objid}
+			''')
+			.setParameter('objid', spouse.address.municipality.objid)
+			.singleResult;
+			spouse.address.municipality = municipality.name
+		}
+		spouse.address.province = "PROVINCE OF BUKIDNON"
+		persistenceSvc.save(spouse);
+
+		def pcommodity = [_schemaname : 'agri_farmerprofile_location_commodity']
+		pcommodity.where = ['farmerprofile_objid = :farmerobjid', [farmerobjid :entity.objid]];
+		def oldcommodities = querySvc.getList(pcommodity);
+		oldcommodities.each{
+			if(!entity.commodities.collect{it.objid}.contains(it.objid)){
+				persistenceSvc.removeEntity([_schemaname : 'agri_farmerprofile_location_commodity',objid:it.objid]);
+			}
+		}
+		
+		entity.commodities.each{
+		
+			if (it?.location?.objid){
+				it.location._schemaname = 'agri_farmerprofile_location'
+				persistenceSvc.save(it.location);
+			}
+		}
+
+		def plivestock = [_schemaname : 'agri_farmerprofile_location_livestock']
+		plivestock.where = ['farmerprofile_objid = :farmerobjid', [farmerobjid :entity.objid]];
+		def oldlivestocks = querySvc.getList(plivestock);
+		oldlivestocks.each{
+			if(!entity.livestocks.collect{it.objid}.contains(it.objid)){
+				persistenceSvc.removeEntity([_schemaname : 'agri_farmerprofile_location_livestock',objid:it.objid]);
+			}
+		}
+		entity.livestocks.each{
+			try {
+			it.seedingdate = dtSvc.parse("yyyy-MM-dd'T'HH:mm:ss.SSS",it.seedingdate).toString();
+			}catch (e){
+				//date is already parsed
+			}
+
+			try {
+			it.harvestingdate = dtSvc.parse("yyyy-MM-dd'T'HH:mm:ss.SSS",it.harvestingdate).toString();
+			}catch (e){
+				//date is already parsed
+			}
+			if (it?.location?.objid){
+				it.location._schemaname = 'agri_farmerprofile_location'
+				persistenceSvc.save(it.location);
+			}
+		}
+
+		def pfacility = [_schemaname : 'agri_farmerprofile_facility']
+		pfacility.where = ['farmerprofile_objid = :farmerobjid', [farmerobjid :entity.objid]];
+		def oldfacilitys = querySvc.getList(pfacility);
+		oldfacilitys.each{
+			if(!entity.farmfacilities.collect{it.objid}.contains(it.objid)){
+				persistenceSvc.removeEntity([_schemaname : 'agri_farmerprofile_facility',objid:it.objid]);
+			}
+		}
+
+		def passistance = [_schemaname : 'agri_farmerprofile_assistance']
+		passistance.where = ['farmerprofile_objid = :farmerobjid', [farmerobjid :entity.objid]];
+		def oldassistances = querySvc.getList(passistance);
+		oldassistances.each{
+			if(!entity.farmerassistances.collect{it.objid}.contains(it.objid)){
+				persistenceSvc.removeEntity([_schemaname : 'agri_farmerprofile_assistance',objid:it.objid]);
+			}
+		}
+
+		entity.farmerassistances.each{
+			try {
+			it.txndate = dtSvc.parse("yyyy-MM-dd'T'HH:mm:ss.SSS",it.txndate).toString();
+			}catch (e){
+				//date is already parsed
+			}
+		}
+
+		entity._schemaname = 'agri_farmerprofile'
+		persistenceSvc.save(entity);
+
+		def updatedfarmer = persistenceSvc.read(entity);
+		updatedfarmer.farmer._schemaname = 'entityindividual'
+		updatedfarmer.farmer = persistenceSvc.read(updatedfarmer.farmer);
+		updatedfarmer.spouse._schemaname = 'entityindividual'
+		updatedfarmer.spouse = persistenceSvc.read(updatedfarmer.spouse);
+
+		return updatedfarmer;
+		
+	}
+
+	@ProxyMethod
+    public def getFarmerNo(address){
+		// def appcode = "FARM"
+		// def yr      = dtSvc.serverYear;
+		// def mnth    = dtSvc.serverMonth;
+		// def smon    = ( mnth < 10 ) ? "0"+mnth : mnth+"";
+		def prefix  = address.municipality.objid + "-FARM";
+		return prefix+seqSvc.getNextFormattedSeries(prefix);
+    }
+	@ProxyMethod
+    public def testdate(){
+		// def appcode = "FARM"
+		// def yr      = dtSvc.serverYear;
+		// def mnth    = dtSvc.serverMonth;
+		// def smon    = ( mnth < 10 ) ? "0"+mnth : mnth+"";
+		// def prefix  = address.municipality.objid + "-FARM";
+		return dtSvc.parse("yyyy-MM-dd'T'HH:mm:ss.SSS",'2020-03-29T11:12:46.457+08:00').toString();;
+    }
 }

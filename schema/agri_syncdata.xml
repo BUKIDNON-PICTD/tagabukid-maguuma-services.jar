@@ -1,0 +1,9 @@
+<schema adapter="tagabukid_maguuma">
+	<element tablename="agri_syncdata">
+		<field name="objid" primary="true" prefix="SS" />
+		<field name="syncdevice" required="true"/>
+		<field name="synctype" required="true"/>
+		<field name="refid" required="true"/>
+		<field name="state" required="true"/>
+	</element>
+</schema>

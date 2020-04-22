@@ -1,14 +1,21 @@
 <schema adapter="tagabukid_maguuma">
     <element tablename="agri_farmerprofile_location_commodity">
         <field name="objid" primary="true" prefix="PC" />
-        <field name="locationid" required="false" caption="locationid" />
+        <field name="location_objid" required="false" caption="locationid" />
+        <field name="farmerprofile_objid" required="false" caption="farmerprofileid" />
+        <field name="state" required="false" caption="state" />
         <field name="commoditytype_objid" required="false" caption="variety_objid" />
         <field name="variety_objid" required="false" caption="variety_objid" />
-        <field name="areasqm" required="false" caption="areaha" />
-        <field name="datestart" required="false" caption="datestart" />
-        <field name="dateend" required="false" caption="dateend" />
+        <field name="quantity" required="false" caption="areaha" />
+        <field name="surveyperiod_objid" required="true" caption="Sruvey Period" />
+        <complex name="location" ref="agri_farmerprofile_location" jointype="many-to-one" required="false">
+            <key field="location_objid" target="objid" /> 		
+        </complex>
         <complex name="variety" ref="master_commodity_variety" jointype="many-to-one" required="false">
             <key field="variety_objid" target="objid" /> 		
+        </complex>
+        <complex name="surveyperiod" ref="master_surveyperiod" jointype="many-to-one" required="false">
+            <key field="surveyperiod_objid" target="objid" /> 		
         </complex>
   
     </element>

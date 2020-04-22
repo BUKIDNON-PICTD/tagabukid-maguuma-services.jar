@@ -9,10 +9,10 @@
     <field name="farmer_firstname" required="true" visible="false" caption="First Name" searchable="false" />
     <field name="farmer_middlename" required="true" caption="Middle Name"  visible="false" searchable="false" />
     <field name="farmer_birthdate" required="true" caption="Birth Date" searchable="true" />
-    <field name="farmer_birthplace" required="true" caption="Birth Plalce" visible="false"  searchable="false" />
+    <field name="farmer_birthplace" caption="Birth Plalce" visible="false"  searchable="false" />
     <field name="farmer_gender" required="true" caption="Gender" searchable="true" />
-    <field name="farmer_civilstatus" required="true" caption="Civil Status"  visible="true" searchable="false" />
-    <field name="farmer_citizenship" required="true" caption="Citizenship"  visible="false" searchable="false" />
+    <field name="farmer_civilstatus" caption="Civil Status"  visible="true" searchable="false" />
+    <field name="farmer_citizenship" caption="Citizenship"  visible="false" searchable="false" />
     
     <field name="farmer_phoneno" required="false" visible="false" searchable="false" />
     <field name="farmer_mobileno" required="false" visible="false" searchable="false" />
@@ -35,13 +35,31 @@
     <field name="recordlog_dateoflastupdate" required="true" visible="false" searchable="false" />
     <field name="recordlog_lastupdatedbyuserid" required="true" visible="false" searchable="false" />
     <field name="recordlog_lastupdatedbyuser" required="true" visible="false" searchable="false" />
+    <field name="lguid" required="true" visible="false" searchable="false" />
+    <field name="barangay_objid" required="true" visible="false" searchable="false" />
+    <field name="is4ps" required="false" visible="false" searchable="false" />
+    <field name="isIP" required="false" visible="false" searchable="false" />
+    <field name="isFarmerAssociationMember" required="false" visible="false" searchable="false" />
+    <field name="photo" visible="false" searchable="false" />
 
-    <complex name="farmlocations" ref="agri_farmerprofile_location" jointype="one-to-many" required="false">
-      <key field="objid" target="farmerprofileid" /> 		
+    <!-- <complex name="farmlocations" ref="agri_farmerprofile_location" jointype="one-to-many" required="false">
+      <key field="objid" target="farmerprofile_objid" /> 		
+    </complex> -->
+
+    <complex name="commodities" ref="agri_farmerprofile_location_commodity" jointype="one-to-many" required="false">
+        <key field="objid" target="farmerprofile_objid" /> 		
+    </complex>
+
+    <complex name="livestocks" ref="agri_farmerprofile_location_livestock" jointype="one-to-many" required="false">
+        <key field="objid" target="farmerprofile_objid" /> 		
     </complex>
 
     <complex name="farmfacilities" ref="agri_farmerprofile_facility" jointype="one-to-many" required="false">
-        <key field="objid" target="farmerprofileid" /> 		
+        <key field="objid" target="farmerprofile_objid" /> 		
+    </complex>
+
+     <complex name="farmerassistances" ref="agri_farmerprofile_assistance" jointype="one-to-many" required="false">
+        <key field="objid" target="farmerprofile_objid" /> 		
     </complex>
   </element>
 

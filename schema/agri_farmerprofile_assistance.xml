@@ -1,0 +1,20 @@
+<schema adapter="tagabukid_maguuma">
+    <element tablename="agri_farmerprofile_assistance">
+        <field name="objid" primary="true" prefix="FL" />
+        <field name="farmerprofile_objid" required="true" />
+        <field name="assistancetype_objid" required="true" />
+        <field name="qty" required="true"/>
+        <field name="txndate" required="true" />
+        <field name="remarks" required="false" />
+        <field name="surveyperiod_objid" required="true"/>
+
+        <complex name="assistancetype" ref="master_assistance_type" jointype="many-to-one" required="false">
+            <key field="assistancetype_objid" target="objid" /> 		
+        </complex>
+
+        <complex name="surveyperiod" ref="master_surveyperiod" jointype="many-to-one" required="false">
+            <key field="surveyperiod_objid" target="objid" /> 		
+        </complex>
+    </element>
+
+</schema>

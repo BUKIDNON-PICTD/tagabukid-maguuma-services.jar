@@ -1,0 +1,19 @@
+<schema adapter="tagabukid_maguuma">
+	<element tablename="master_assistance_type">
+		<field name="objid" primary="true" prefix="CAST" />
+		<field name="parentid" visible="false" searchable="false"/>
+		<field name="name" required="true" caption="Name" searchable="true"/>
+		<field name="description" required="false" caption="Description" visible="true" searchable="true"/>
+		<field name="code" caption="Code" required="false" visible="true" searchable="true"/>
+		<field name="unitofmeasure" caption="Unit of Measure" required="false" visible="true" searchable="true"/>
+		<field name="recordlog_datecreated" required="true" visible="false"/>
+		<field name="recordlog_createdbyuserid" required="true" visible="false"/>
+		<field name="recordlog_createdbyuser" required="true" visible="false"/>
+		<field name="recordlog_dateoflastupdate" visible="false"/>
+		<field name="recordlog_lastupdatedbyuserid" visible="false"/>
+		<field name="recordlog_lastupdatedbyuser" visible="false"/>
+		<complex name="classification" ref="master_assistance_classification" jointype="many-to-one" required="false">
+			<key field="parentid" target="objid" />
+		</complex>
+	</element>
+</schema>

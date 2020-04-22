@@ -1,17 +1,25 @@
 <schema adapter="tagabukid_maguuma">
     <element tablename="agri_farmerprofile_location_livestock">
     <field name="objid" primary="true" prefix="PL" />
-    <field name="locationid" required="false" caption="locationid" />
+    <field name="location_objid" required="false" caption="locationid" />
+    <field name="farmerprofile_objid" required="false" caption="farmerprofileid" />
+    <field name="state" required="false" caption="state" />
     <field name="species_objid" required="false" caption="breed_objid" />
     <field name="breed_objid" required="false" caption="breed_objid" />
     <field name="seedingqty" required="false" caption="harvestingdate" />
     <field name="seedingdate" required="false" caption="seedingdate" />
     <field name="harvestingqty" required="false" caption="harvestingdate" />
     <field name="harvestingdate" required="false" caption="harvestingdate" />
-    <field name="remark" required="false" caption="remark" />
-
+    <field name="remarks" required="false" caption="remark" />
+    <field name="surveyperiod_objid" required="true" caption="Sruvey Period" />
+    <complex name="location" ref="agri_farmerprofile_location" jointype="many-to-one" required="false">
+        <key field="location_objid" target="objid" /> 		
+    </complex>
     <complex name="breed" ref="master_livestock_breed" jointype="many-to-one" required="false">
         <key field="breed_objid" target="objid" /> 		
     </complex>
+    <complex name="surveyperiod" ref="master_surveyperiod" jointype="many-to-one" required="false">
+            <key field="surveyperiod_objid" target="objid" /> 		
+        </complex>
     </element>
 </schema>

@@ -1,12 +1,12 @@
 <schema adapter="tagabukid_maguuma">
 	<element tablename="master_commodity_variety">
 		<field name="objid" primary="true" prefix="COM-VAR" />
-		<field name="commoditytype_objid" primary="false" visible="false" prefix="COM-TYPE"/>
+		<field name="parentid" primary="false" visible="false"/>
 		<field name="name" required="true" caption="Name" searchable="true" />
 		<field name="code" required="false" caption="Code" searchable="true" />
 		<field name="description" required="false" caption="Description" searchable="true" />
 		<complex name="commoditytype" ref="master_commodity_type" jointype="many-to-one" required="false">
-			<key field="commoditytype_objid" target="objid" /> 		
+			<key field="parentid" target="objid" /> 		
 		</complex>
 	</element>
 </schema>
