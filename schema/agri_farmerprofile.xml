@@ -1,7 +1,7 @@
 <schema adapter="tagabukid_maguuma">
 	<element tablename="agri_farmerprofile">
     <field name="objid" primary="true" prefix="FARM"/>
-    <field name="state" required="true"  caption="Farmer No" searchable="true" visible="false"/>
+    <field name="state" required="true"  caption="state" searchable="true" visible="false"/>
     <field name="fno" required="true"  caption="Farmer No" searchable="true" visible="false"/>
     <field name="farmer_objid" required="true" searchable="true" visible="false"/>
     <field name="farmer_name" required="true" visible="true" caption="Farmer Name" searchable="true"/>
@@ -18,8 +18,8 @@
     <field name="farmer_mobileno" required="false" visible="false" searchable="false" />
     <field name="farmer_email" required="false" visible="false" searchable="false" />
 
-    <complex name="farmer_address" required="true" visible="false" serializer="default"/>
-    <field name="farmer_address_text" required="true" caption="Address"  searchable="true"/>
+    <complex name="farmer_address" required="false" visible="false" serializer="default"/>
+    <field name="farmer_address_text" required="false" caption="Address"  searchable="true"/>
 
     <field name="spouse_objid" required="false" searchable="true" visible="false"/>
  
